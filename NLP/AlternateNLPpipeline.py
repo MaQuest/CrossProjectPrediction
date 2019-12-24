@@ -5,6 +5,7 @@ import inflect
 from nltk import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import LancasterStemmer, WordNetLemmatizer
+from nltk.util import ngrams
 import pandas as pd
 
 import winsound
@@ -89,6 +90,16 @@ def normalize(words):
     words = replace_numbers(words)
     words = remove_stopwords(words)
     return words
+
+""" this function takes in a string and length of n-gram"""
+def generate_ngrams(words,n):
+    words = words.lower()
+    """ substitute alphanumeric symbols to spaces"""
+    words = re.sub(r'[^a-zA-Z0-9\s]', ' ', words)
+    tokens = [token for token in words.split(" ") if token != ""]
+    """ generate the ngrams """
+    ngrams = list(ngrams(tokens, n))
+    return ngrams
 
 # def preprocess(sample):
 #     sample = remove_URL(sample)
