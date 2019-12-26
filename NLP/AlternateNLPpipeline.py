@@ -91,15 +91,29 @@ def normalize(words):
     words = remove_stopwords(words)
     return words
 
-""" this function takes in a string and length of n-gram"""
-def generate_ngrams(words,n):
+## generate tokens for strings
+def generate_tokens(words):
     words = words.lower()
-    """ substitute alphanumeric symbols to spaces"""
-    words = re.sub(r'[^a-zA-Z0-9\s]', ' ', words)
-    tokens = [token for token in words.split(" ") if token != ""]
-    """ generate the ngrams """
-    ngrams = list(ngrams(tokens, n))
-    return ngrams
+    tokens = re.findall(r"(?<![@#])\b\w+(?:'\w+)?", words)
+    return tokens
+
+
+## works best so far for nlp
+def generate_collocated_ngrams(words, ngrams):
+    tokenized_text = generate_tokens(words)
+    if (ngrams == 2):
+        measures = nltk.collocations.BigramAssocMeasures()
+        finder = BigramCollocationFinder.from_words(tokenized_text)
+    if (ngrams == 3):
+        measures = nltk.collocations.TrigramAssocMeasures()
+        finder = TrigramCollocationFinder.from_words(tokenized_text)
+    return finder.nbest(measures.pmi, 10)
+
+## takes the descriptions of reqs and creates ngrams 
+def generate_ngrams_df(df, ngrams):
+    df["req1"] = df["req1"].apply(lambda x: generate_collocated_ngrams(x,ngrams))
+    df["req2"] = df["req2"].apply(lambda y: generate_collocated_ngrams(y,ngrams))
+    return df
 
 # def preprocess(sample):
 #     sample = remove_URL(sample)
