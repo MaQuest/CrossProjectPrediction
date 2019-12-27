@@ -1,14 +1,17 @@
+import numpy as np
+from nltk.corpus import wordnet as wn
+from nltk.collocations import *
 import re, string, unicodedata
 import nltk
 #import contractions
-import inflect
 from nltk import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import LancasterStemmer, WordNetLemmatizer
 from nltk.util import ngrams
 import pandas as pd
+import inflect
 
-import winsound
+
 frequency = 2500  # Set Frequency To 2500 Hertz
 duration = 1000  # Set Duration To 1000 ms == 1 second
 
@@ -143,6 +146,9 @@ def NLPpipeLine(df_data,col1,col2):
     #Tokenize
     df_data[col1] = df_data[col1].apply(nltk.word_tokenize)
     df_data[col2] = df_data[col2].apply(nltk.word_tokenize)
+    
+    #Collocated ngrams, set to bigrams
+    df_data = generate_ngrams_df(df_data,2)
     
     # Normalize
     #words = normalize(words)
