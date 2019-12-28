@@ -103,7 +103,6 @@ def generate_tokens(words):
 
 ## works best so far for nlp
 def generate_collocated_ngrams(words, ngrams):
-    tokenized_text = generate_tokens(words)
     if (ngrams == 2):
         measures = nltk.collocations.BigramAssocMeasures()
         finder = BigramCollocationFinder.from_words(tokenized_text)
