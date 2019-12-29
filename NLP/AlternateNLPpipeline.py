@@ -102,7 +102,7 @@ def generate_tokens(words):
 
 
 ## works best so far for nlp
-def generate_collocated_ngrams(words, ngrams):
+def generate_collocated_ngrams(tokenized_text, ngrams):
     if (ngrams == 2):
         measures = nltk.collocations.BigramAssocMeasures()
         finder = BigramCollocationFinder.from_words(tokenized_text)
@@ -146,13 +146,14 @@ def NLPpipeLine(df_data,col1,col2):
     df_data[col1] = df_data[col1].apply(nltk.word_tokenize)
     df_data[col2] = df_data[col2].apply(nltk.word_tokenize)
     
-    #Collocated ngrams, set to bigrams
-    df_data = generate_ngrams_df(df_data,2)
-    
     # Normalize
     #words = normalize(words)
     df_data[col1] = df_data[col1].apply(normalize)
     df_data[col2] = df_data[col2].apply(normalize)
+    
+    #Collocated ngrams, set to bigrams
+    df_data = generate_ngrams_df(df_data, 2)
+    
     print(df_data['req1'].head())
     input("hit enter")
 
