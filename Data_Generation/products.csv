@@ -1,11 +1,11 @@
 ProductId,ProductName,ToBeProcessedFlag
 1,Core,True
 2,Firefox,True
-3,DevTools,False
+3,DevTools,True
 4,Toolkit,True
-5,Thunderbird,False
-6,Testing,False
-7,SeaMonkey,False
-8,Firefox Build System,False
-9,Bugzilla,False
-10,WebExtensions,False
+5,Thunderbird,True
+6,Testing,True
+7,SeaMonkey,True
+8,Firefox Build System,True
+9,Bugzilla,True
+10,WebExtensions,True
