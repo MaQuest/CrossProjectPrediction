@@ -1,10 +1,11 @@
 #program to generate independent samples (requirement pairs) within different projects
-#List of projects can be provided in products.txt file
+#List of projects can be provided in products.csv file with ToBeProcessed Flag set to True/False
 #Dataset is available in /NLP/Requires_enhancement_2_enhancementData.csv
 
 import pandas as pd
 import os
 import winsound
+import argparse
 
 pd.set_option("display.max_rows", 1000)
 pd.set_option('display.max_colwidth', -1)
@@ -14,7 +15,15 @@ pd.set_option('display.max_columns', None)
 frequency = 2500  # Set Frequency To 2500 Hertz
 duration = 1000  # Set Duration To 1000 ms == 1 second
 
-def genPosNegSamples(df_data,products):
+def get_args():
+    
+    parser = argparse.ArgumentParser(description="This script takes the dependent requirements from various projects as input and generates independent requirement pairs among the projects.", formatter_class = argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--input","-i",type=str,required = False,default="../NLP/Requires_enhancement_2_enhancementData.csv",help="path to dependent requirement combinations data file")
+    parser.add_argument("--maxPairs","-mp",type=int,default=50000, required=False,help="Maximum number of independent requirement pairs you wish to generate for each set of projects.")
+    
+    return parser.parse_args()
+
+def genPosNegSamples(df_data,products,maxPairs):
     '''
     Generates Positive (dependent) and Negative (Independent) Samples for the dataset.
     
@@ -29,15 +38,15 @@ def genPosNegSamples(df_data,products):
             print ("Number of positive samples found in data set : ",len(df_iVsj_pos))
         
             print("Generating negative samples...")
-            df_iVsj_neg = genNeg(df_iVsj_pos)
+            df_iVsj_neg = genNeg(df_iVsj_pos,maxPairs)
             print ("Number of negative samples generated : ",len(df_iVsj_neg))
 
-            df_iVsj_neg.to_csv("./NegativeSamples/"+i+"Vs"+j+"_NegativeSamples.csv",encoding="utf-8")
-            print ("Generated negative samples are available at : ","./NegativeSamples/"+i+"Vs"+j+"_NegativeSamples.csv")
+            df_iVsj_neg.to_csv("./NegativeSamples/"+i+"Vs"+j+"_"+str(len(df_iVsj_neg))+"_Samples.csv",encoding="utf-8")
+            print ("Generated negative samples are available at : ","./NegativeSamples/"+i+"Vs"+j+"_"+str(len(df_iVsj_neg))+"_Samples.csv")
             winsound.Beep(frequency, duration)
-            input('hit enter to proceed to next set.............')
+            input('hit enter to proceed to next set...')
 
-def genNeg(df_data):
+def genNeg(df_data,maxSamples):
     '''
     From the positive samples generates the combinations which are independent of each other.
 
@@ -48,7 +57,7 @@ def genNeg(df_data):
         #  req2	req2Id	req2Priority req2Product	
         # req2Release	req2Severity	req2Type	req2Ver
 
-    Limiting the number of pairs to 200000
+    Limiting the number of pairs to 50000 (default)
     '''
 
     UniqueIds = df_data['req1Id']
@@ -106,26 +115,36 @@ def genNeg(df_data):
                     print("Some print error")
                 print("----------------------------------------")
                 List_data_neg.append(pair) 
-                if len(List_data_neg)>100:  #if len(List_data_neg)>200000:
+                print ("Length of list_data_neg : ",len(List_data_neg))
+                if (len(List_data_neg)>(maxSamples - 1)):  #maxSamples - 1 because list starts with index 0
                     df_neg = pd.DataFrame(List_data_neg)
-                    print (df_neg.tail(5))
+                    #print (df_neg.tail(5))
                     return df_neg
 
-    return 0
+    df_neg = pd.DataFrame(List_data_neg)
+    return df_neg
 
-#Read dataset into dataframe
-dataset = pd.read_csv("../NLP/Requires_enhancement_2_enhancementData.csv")
+def main():
 
-#get list of projects from products.txt file
-file = open('products.txt').readlines()
-products_list = list()
-for line in file:
-    products_list.append(line.strip())
-#print (products_list)
+    args = get_args()  #Get all the command line arguments
 
-#Create NegativeSamples directory if it doesn't exist
-if not os.path.exists('NegativeSamples'):
-    os.makedirs('NegativeSamples')
+    ifileName = args.input     
+    maxNegativeSamples = args.maxPairs
 
-#Generate Positive Negative Samples and Save them to the csv file
-genPosNegSamples(dataset,products_list)
+    #Read dataset into dataframe
+    dataset = pd.read_csv(ifileName)
+
+    #Get list of products for which negative samples are to be generated
+    productsDF = pd.read_csv("Products.csv")
+    productsFiltered = productsDF[productsDF['ToBeProcessedFlag']==True] #only use products with ToBeProcessedFlag = True 
+    products_list = list(productsFiltered['ProductName'])
+
+    #Create NegativeSamples directory if it doesn't exist
+    if not os.path.exists('NegativeSamples'):
+        os.makedirs('NegativeSamples')
+
+    #Generate Positive Negative Samples and Save them to the csv file
+    genPosNegSamples(dataset,products_list,maxNegativeSamples)
+
+if __name__ == '__main__':
+    main()
