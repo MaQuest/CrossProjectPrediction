@@ -12,8 +12,8 @@ import pandas as pd
 import inflect
 
 
-frequency = 2500  # Set Frequency To 2500 Hertz
-duration = 1000  # Set Duration To 1000 ms == 1 second
+# frequency = 2500  # Set Frequency To 2500 Hertz
+# duration = 1000  # Set Duration To 1000 ms == 1 second
 
 # def replace_contractions(text):
 #     """Replace contractions in string of text"""
@@ -167,7 +167,7 @@ def Test():
     df_data = pd.read_csv("Requires_enhancement_2_enhancementData.csv")
     #print(df_data['req1'].head(5))
     df_data = NLPpipeLine(df_data,'req1','req2')
-    winsound.Beep(frequency, duration)
+    #winsound.Beep(frequency, duration)
     df_data.to_csv("Processed_Requires_enhancement_2_enhancementData.csv")
 
 import os
@@ -202,9 +202,9 @@ def processAllFileListLines():
     print(size)
     
 
-processAllFileListLines()
+#processAllFileListLines()
 
 
-#Test()
+Test()
 #processAllFile()
 
